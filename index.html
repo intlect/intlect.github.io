@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flask Farms</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <table id="cpuTable">
+      <thead>
+        <tr>
+          <th>Host</th>
+          <th>CPU Percent</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      const hosts = [
+        "1.228.240.134:7777",
+        "1.233.78.46:9999",
+        "1.236.76.125:9999",
+        "1.243.214.189:9999",
+        "103.106.89.40:9999",
+        "103.106.90.242:9999",
+        "112.162.175.216:9999",
+        "112.173.57.228:9999",
+        "114.203.163.222:7777",
+        "114.203.163.222:9999",
+        "115.93.126.130:9999",
+        "115.93.126.132:7777",
+        "116.32.203.9:8888",
+        "118.223.30.219:9999",
+        "118.241.241.149:9999",
+        "119.194.101.74:9999",
+        "121.140.70.112:9999",
+        "121.144.31.155:9999",
+        "121.161.36.218:9999",
+        "121.162.71.26:7777",
+        "121.187.233.109:7777",
+        "121.187.233.109:8888",
+        "124.50.186.197:9999",
+        "124.61.185.44:9999",
+        "124.63.231.43:7777",
+        "125.133.184.59:7777",
+        "125.187.35.232:9999",
+        "125.242.39.46:9999",
+        "129.154.193.37:9999",
+        "129.154.50.80:9999",
+        "129.154.59.121:9999",
+        "132.145.87.28:9999",
+        "132.145.89.3:9999",
+        "132.145.92.233:9999",
+        "132.226.168.112:8888",
+        "132.226.17.94:9999",
+        "132.226.175.103:9999",
+        "132.226.18.76:8888",
+        "132.226.234.19:9999",
+        "14.43.135.3:9999",
+        "14.48.172.247:8888",
+        "140.238.21.130:9999",
+        "140.238.25.122:9997",
+        "140.238.25.122:9999",
+        "140.238.4.84:9999",
+        "140.238.8.94:9999",
+        "141.147.148.102:9997",
+        "141.147.148.102:9999",
+        "144.24.137.218:8888",
+        "144.24.137.218:9999",
+        "144.24.69.86:9999",
+        "146.56.101.199:8888",
+        "146.56.101.5:9999",
+        "146.56.105.223:8888",
+        "146.56.105.223:9999",
+        "146.56.107.155:9999",
+        "146.56.115.173:9999",
+        "146.56.142.223:9999",
+        "146.56.181.199:9999",
+        "146.56.39.145:7779",
+        "150.230.44.10:9999",
+        "152.67.217.98:9999",
+        "152.67.220.208:7777",
+        "152.67.223.6:8888",
+        "152.69.226.218:9999",
+        "152.70.115.226:9999",
+        "152.70.81.1:9999",
+        "152.70.84.14:9999",
+        "167.179.157.213:8888",
+        "167.179.157.213:9999",
+        "168.138.215.83:9999",
+        "168.138.90.94:8888",
+        "168.138.90.94:9999",
+        "173.63.35.38:8888",
+        "173.63.35.38:9999",
+        "175.115.66.240:8009",
+        "175.117.246.80:7779",
+        "175.117.246.80:9999",
+        "175.195.31.248:8888",
+        "175.196.59.7:7777",
+        "175.196.59.7:8888",
+        "182.218.222.61:9999",
+        "192.9.131.184:9999",
+        "193.123.229.105:8888",
+        "193.123.239.38:9999",
+        "210.103.18.13:7777",
+        "210.106.222.67:9999",
+        "210.113.62.43:7777",
+        "210.113.62.43:9999",
+        "211.114.117.157:7777",
+        "211.114.117.157:8888",
+        "211.177.115.153:9999",
+        "211.187.102.98:7777",
+        "211.217.145.143:9998",
+        "211.217.145.143:9999",
+        "211.59.7.89:9999",
+        "218.146.27.32:9999",
+        "218.150.205.91:9999",
+        "218.235.106.180:9999",
+        "218.38.62.71:8888",
+        "221.141.175.126:9999",
+        "221.146.6.94:5555",
+        "221.147.89.106:9999",
+        "222.237.81.173:7700",
+        "222.237.81.173:7777",
+        "3.234.10.198:80",
+        "3.94.215.156:80",
+        "34.203.7.128:80",
+        "34.98.101.243:443",
+        "39.118.66.109:7777",
+        "39.118.66.109:9997",
+        "49.161.219.90:8888",
+        "49.161.219.90:9999",
+        "52.202.71.171:443",
+        "52.4.65.173:443",
+        "52.44.47.221:443",
+        "52.5.43.185:443",
+        "54.147.70.141:443",
+        "54.157.220.247:443",
+        "54.198.156.208:80",
+        "54.208.189.237:80",
+        "54.234.134.204:80",
+        "58.122.217.128:7777",
+        "58.122.217.128:8888",
+        "58.127.215.199:8888",
+        "58.127.215.199:9999",
+        "58.228.214.102:9999",
+        "58.232.128.32:9999",
+        "59.13.95.228:7777",
+        "59.14.38.51:7777",
+        "59.14.38.51:9997",
+        "59.14.38.51:9998",
+        "59.14.38.51:9999",
+        "59.24.82.128:9999",
+        "59.28.200.125:9999",
+        "61.47.250.50:7777",
+        "61.78.167.81:9999",
+        "61.83.159.190:7777",
+        "61.99.123.151:8888",
+      ];
+
+      async function fetchCPU(host) {
+        const sidUrl = `http://${host}/socket.io/?EIO=4&transport=polling`;
+        let response = await fetch(sidUrl);
+        let data = await response.text();
+        try {
+          data = JSON.parse(data.substring(1));
+          let sid = data.sid;
+
+          const postUrl = `http://${host}/socket.io/?EIO=4&transport=polling&sid=${sid}`;
+
+          await fetch(postUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "text/plain",
+            },
+            body: "40/system/home,",
+          });
+
+          const uri = `ws://${host}/socket.io/?EIO=4&transport=websocket&sid=${sid}`;
+          const socket = new WebSocket(uri);
+          socket.onopen = () => {
+            socket.send("2probe");
+            socket.send("5");
+          };
+
+          socket.onmessage = (event) => {
+            const message = event.data;
+            if (message.startsWith("42/system/home,")) {
+              const payload = JSON.parse(message.substring(15));
+              const cpuPercent = payload[1].system.cpu_percent;
+              updateTable(host, cpuPercent);
+            }
+          };
+        } catch {
+          let sjCPU = fetchSJCPU(host);
+        }
+      }
+
+      async function fetchSJCPU(host) {
+        const sidUrl = `http://${host}/socket.io/?EIO=3&transport=polling&t=P5Mc8Q2`;
+        let response = await fetch(sidUrl);
+        let data = await response.text();
+        data = data.substring(data.indexOf("0") + 1, data.lastIndexOf("}") + 1);
+        data = JSON.parse(data);
+        let sid = data.sid;
+        let cpuUrl = `http://${host}/socket.io/?EIO=3&transport=polling&t=P5Mc8Q2&sid=${sid}`;
+        await fetch(cpuUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain",
+          },
+          body: "9:40/system",
+        });
+        await fetch(cpuUrl);
+        response = await fetch(cpuUrl);
+        data = await response.text();
+        data = JSON.parse(data.substring(data.indexOf("[")));
+        cpuPercent = data[1].system.cpu_percent;
+        updateTable(host, cpuPercent);
+      }
+
+      function updateTable(host, cpuPercent) {
+        const tableBody = document
+          .getElementById("cpuTable")
+          .getElementsByTagName("tbody")[0];
+        let row = document.querySelector(`tr[data-host="${host}"]`);
+        if (!row) {
+          row = tableBody.insertRow();
+          row.setAttribute("data-host", `${host}`);
+          const cellHost = row.insertCell(0);
+          const cellCpu = row.insertCell(1);
+          cellHost.innerHTML = `<a target="_blank" href=http://${host}>${host}</a>`;
+          cellCpu.textContent = cpuPercent;
+        } else {
+          row.cells[1].textContent = cpuPercent;
+        }
+      }
+
+      hosts.forEach((host) => fetchCPU(host));
+    </script>
+  </body>
+</html>
