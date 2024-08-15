@@ -245,7 +245,7 @@
           row.setAttribute("data-host", `${host}`);
           const cellHost = row.insertCell(0);
           const cellCpu = row.insertCell(1);
-          cellHost.innerHTML = `<a target="_blank" href=http://${host}>${host}</a>`;
+          cellHost.innerHTML = `<a target="_blank" href=http://${host}/terminal>${host}</a>`;
           cellCpu.textContent = cpuPercent;
         } else {
           row.cells[1].textContent = cpuPercent;
